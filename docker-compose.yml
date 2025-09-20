@@ -1,0 +1,38 @@
+# This is the final, corrected configuration for a modern, standalone Kafka server.
+# It removes the outdated Zookeeper service entirely and uses the required KRaft mode.
+# This configuration is self-contained and correct for the latest Bitnami image.
+services:
+  kafka:
+    image: 'bitnami/kafka:latest'
+    ports:
+      # This exposes Kafka's main port to your local machine so your Python script can connect.
+      - '9092:9092'
+    environment:
+      # --- KRaft Mode Configuration (Replaces Zookeeper) ---
+
+      # Assigns a unique ID to this Kafka node. For a single node, '0' is standard.
+      - KAFKA_CFG_NODE_ID=0
+
+      # Tells Kafka that this node will act as both a controller (managing the cluster)
+      # and a broker (handling messages).
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+
+      # Defines the security protocols for the internal controller and external clients.
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+
+      # Specifies the ports Kafka will listen on. 9092 for clients, 9093 for the internal controller.
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+
+      # Tells external clients (like our Python script) how to connect to the broker.
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+
+      # Defines the list of nodes that can vote in the KRaft cluster. For a single node,
+      # it points to itself (node ID 0, at the 'kafka' service on the controller port).
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+
+      # Names the listener used by the controller.
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+
+      # A Bitnami-specific variable required to allow non-encrypted connections.
+      - ALLOW_PLAINTEXT_LISTENER=yes
+

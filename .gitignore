@@ -1,0 +1,19 @@
+# Virtual Environment
+venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+
+# FastF1 cache
+cache/
+fastf1_http_cache.sqlite# Virtual Environment
+venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+
+# FastF1 cache
+cache/
+fastf1_http_cache.sqlite
